@@ -1,0 +1,36 @@
+### 1. GET all resources (uncached)
+GET http://localhost:8082/api/resources
+Accept: application/json
+
+### 2. GET all resources again (cached)
+GET http://localhost:8082/api/resources
+Accept: application/json
+
+### 3. GET resources filtered by category
+GET http://localhost:8082/api/resources?category=mindfulness
+Accept: application/json
+
+### 4. POST create a new resource
+POST http://localhost:8082/api/resources
+Content-Type: application/json
+
+{
+  "title": "Mindfulness Basics",
+  "description": "Intro guide to meditation",
+  "category": "mindfulness",
+  "url": "https://example.com/mindfulness"
+}
+
+### 5. PUT update resource (replace {id})
+PUT http://localhost:8082/api/resources/1
+Content-Type: application/json
+
+{
+  "title": "Mindfulness Basics Updated",
+  "description": "Updated guide",
+  "category": "mindfulness",
+  "url": "https://example.com/mindfulness-updated"
+}
+
+### 6. DELETE resource (replace {id})
+DELETE http://localhost:8082/api/resources/1

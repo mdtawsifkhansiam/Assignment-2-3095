@@ -1,0 +1,114 @@
+{
+  "id": "gbc-realm",
+  "realm": "gbc-realm",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "student",
+        "description": "Student role"
+      },
+      {
+        "name": "staff",
+        "description": "Staff role"
+      },
+      {
+        "name": "admin",
+        "description": "Administrator role"
+      }
+    ]
+  },
+  "groups": [],
+  "users": [
+    {
+      "username": "student1",
+      "email": "student1@gbc.ca",
+      "firstName": "John",
+      "lastName": "Student",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"],
+      "clientRoles": {}
+    },
+    {
+      "username": "staff1",
+      "email": "staff1@gbc.ca",
+      "firstName": "Jane",
+      "lastName": "Staff",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["staff"],
+      "clientRoles": {}
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "api-gateway",
+      "name": "API Gateway",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "gateway-secret",
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true
+    },
+    {
+      "clientId": "wellness-service",
+      "name": "Wellness Service",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "wellness-secret",
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true
+    },
+    {
+      "clientId": "goal-tracking-service",
+      "name": "Goal Tracking Service",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "goal-secret",
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true
+    },
+    {
+      "clientId": "event-service",
+      "name": "Event Service",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "event-secret",
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true
+    }
+  ],
+  "clientScopes": []
+}

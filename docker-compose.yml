@@ -1,4 +1,3 @@
-
 services:
   # --- DATABASES ---
   postgres:
@@ -29,40 +28,82 @@ services:
     networks:
       - wellness-net
 
-  # --- MESSAGE BROKER ---
+  # --- MESSAGE BROKER (Fixed Versions) ---
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.4.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     networks:
       - wellness-net
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.4.0
     depends_on:
       - zookeeper
     environment:
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
     networks:
       - wellness-net
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:latest
+    image: confluentinc/cp-schema-registry:7.4.0
     depends_on:
       - kafka
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'PLAINTEXT://kafka:9092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
     ports:
       - "8081:8081"
+    networks:
+      - wellness-net
+
+  # --- OBSERVABILITY STACK ---
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - wellness-net
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - wellness-net
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - wellness-net
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./observability/promtail/promtail-config.yaml:/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml
     networks:
       - wellness-net
 
@@ -75,28 +116,26 @@ services:
       KC_DB: dev-file
     ports:
       - "8080:8080"
-    command: [
-      "start-dev",
-      "--import-realm"
-    ]
+    command: [ "start-dev", "--import-realm" ]
     volumes:
       - ./keycloak-setup/import-realm.json:/opt/keycloak/data/import/realm.json
     networks:
       - wellness-net
 
-  # --- API GATEWAY ---
+  # --- MICROSERVICES ---
   api-gateway:
     build: ./api-gateway
     ports:
       - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411/api/v2/spans
     depends_on:
       - keycloak
+      - prometheus
     networks:
       - wellness-net
 
-  # --- YOUR MICROSERVICES ---
   wellness-service:
     build: ./wellness-service
     ports:
@@ -107,19 +146,22 @@ services:
       - postgres
       - redis
       - keycloak
+      - kafka
     networks:
       - wellness-net
 
   goal-tracking-service:
     build: ./goal-tracking-service
     ports:
-      - "8084:8084"
+      # Fixed the port mapping mismatch (Host 8084 -> Container 8080)
+      - "8084:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mongodb
       - keycloak
       - kafka
+      - schema-registry
     networks:
       - wellness-net
 

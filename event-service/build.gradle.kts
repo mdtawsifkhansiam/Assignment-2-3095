@@ -1,7 +1,7 @@
 plugins {
 	java
-	id("org.springframework.boot") version "3.5.7"
-	id("io.spring.dependency-management") version "1.1.7"
+	id("org.springframework.boot") version "3.2.2"
+	id("io.spring.dependency-management") version "1.1.4"
 }
 
 group = "ca.gbc.comp3095"
@@ -21,6 +21,8 @@ configurations {
 
 repositories {
 	mavenCentral()
+	// Add Confluent repo for Kafka Schema Registry
+	maven { url = uri("https://packages.confluent.io/maven/") }
 }
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
@@ -36,6 +38,8 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
+
+	// Testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	testImplementation("org.testcontainers:junit-jupiter")
@@ -46,8 +50,14 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("io.micrometer:micrometer-registry-prometheus")
 	implementation("io.github.resilience4j:resilience4j-spring-boot3:2.1.0")
+
+	// Kafka
 	implementation("org.springframework.kafka:spring-kafka")
+	implementation("io.confluent:kafka-json-schema-serializer:7.5.0")
+
+	// Docs
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 	testImplementation("org.testcontainers:kafka")
 }

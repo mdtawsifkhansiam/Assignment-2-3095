@@ -1,7 +1,6 @@
 package ca.gbc.comp3095.wellnessservice.config;
 
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
-import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -24,10 +23,10 @@ public class KafkaConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaJsonSchemaDeserializer.class);
         props.put("schema.registry.url", "http://schema-registry:8081");
 
-        // Fixed: Use KafkaJsonSchemaDeserializerConfig for these constants
-        props.put(KafkaJsonSchemaDeserializerConfig.TYPE_MAPPINGS_CONFIG,
-                "goalCompletedEvent:ca.gbc.goaltrackingservice.dto.GoalCompletedEvent");
-        props.put(KafkaJsonSchemaDeserializerConfig.FAIL_INVALID_SCHEMA_CONFIG, false);
+        // Fixed constants
+        props.put("json.value.type.mappings",
+                "goalCompletedEvent:ca.gbc.comp3095.wellnessservice.dto.GoalCompletedEvent");
+        props.put("json.fail.invalid.schema", false);
 
         return new DefaultKafkaConsumerFactory<>(props);
     }

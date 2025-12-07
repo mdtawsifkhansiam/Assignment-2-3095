@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.2.2
+    id("org.springframework.boot") version "3.2.2" // FIX: Added missing quote here
     id("io.spring.dependency-management") version "1.1.4"
 }
 
@@ -34,6 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.data:spring-data-redis")
+
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 

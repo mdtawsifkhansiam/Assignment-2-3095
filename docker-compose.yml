@@ -44,14 +44,16 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      # FIX: Changed external listener (PLAINTEXT_HOST) to 29092 to avoid port conflict
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     ports:
-      - "9092:9092"
+      # FIX: Expose 29092 instead of 9092 for external access
+      - "29092:29092"
     networks:
       - wellness-net
 
@@ -133,6 +135,7 @@ services:
     depends_on:
       - keycloak
       - prometheus
+    restart: on-failure
     networks:
       - wellness-net
 
@@ -147,6 +150,7 @@ services:
       - redis
       - keycloak
       - kafka
+    restart: on-failure
     networks:
       - wellness-net
 
@@ -162,6 +166,7 @@ services:
       - keycloak
       - kafka
       - schema-registry
+    restart: on-failure
     networks:
       - wellness-net
 
@@ -175,6 +180,7 @@ services:
       - postgres
       - keycloak
       - kafka
+    restart: on-failure
     networks:
       - wellness-net
 

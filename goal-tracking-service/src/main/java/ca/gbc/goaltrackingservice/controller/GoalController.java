@@ -3,6 +3,7 @@ package ca.gbc.goaltrackingservice.controller;
 import ca.gbc.goaltrackingservice.model.Goal;
 import ca.gbc.goaltrackingservice.service.GoalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class GoalController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('student')")
     public Goal createGoal(@RequestBody Goal goal) {
         return goalService.createGoal(goal);
     }

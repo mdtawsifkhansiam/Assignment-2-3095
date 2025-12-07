@@ -21,7 +21,6 @@ configurations {
 
 repositories {
 	mavenCentral()
-	// Add Confluent repo for Kafka Schema Registry
 	maven { url = uri("https://packages.confluent.io/maven/") }
 }
 
@@ -34,6 +33,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	// Added AOP
+	implementation("org.springframework.boot:spring-boot-starter-aop")
+
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
